@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'WebNovel'
-include('lib')
+include('webnovel')
