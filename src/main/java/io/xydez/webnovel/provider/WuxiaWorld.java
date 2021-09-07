@@ -25,13 +25,10 @@ public class WuxiaWorld implements IProvider {
 	@Override
 	public CompletableFuture<List<INovel>> search(String query) {
 		return CompletableFuture.supplyAsync(() -> {
-			// ArrayList<INovel> novels = new ArrayList<>();
-
 			try {
 				Document doc = Jsoup.connect(String.format("https://wuxiaworld.site/?s=%s&post_type=wp-manga", URLEncoder.encode(query, "UTF-8"))).get();
 
 				return Utility.sequence(doc.select(".search-wrap .row").stream().map(result -> CompletableFuture.supplyAsync(() -> {
-					System.out.println("Promise begin");
 					Elements cols = result.select("> div");
 
 					// Referer: https://wuxiaworld.site/
@@ -47,26 +44,9 @@ public class WuxiaWorld implements IProvider {
 						throw new CompletionException(e);
 					}
 				})).collect(Collectors.toList())).get();
-
-				/*
-				for (Element result : doc.select(".search-wrap .row")) {
-					Elements cols = result.select("> div");
-
-					// Referer: https://wuxiaworld.site/
-					String imageUrl = cols.get(0).select("img").attr("src");
-
-					Elements titleEl = cols.get(1).select(".post-title a");
-					String link = titleEl.attr("href");
-					String name = titleEl.text();
-
-					novels.add(new Novel(name, imageUrl, link));
-				}
-				*/
 			} catch (Exception e) {
 				throw new CompletionException(e);
 			}
-
-			//return novels;
 		});
 	}
 
