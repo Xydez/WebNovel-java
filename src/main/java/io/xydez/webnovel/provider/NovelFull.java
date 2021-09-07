@@ -61,7 +61,7 @@ public class NovelFull implements IProvider {
 			this.imageUrl = imageUrl;
 
 			Document doc = Jsoup.connect(link).get();
-			this.synopsis = doc.select("#tab-description .desc-text p").stream().map(Element::text).collect(Collectors.joining("\n\n"));
+			this.synopsis = doc.select(".desc-text p").stream().map(Element::text).collect(Collectors.joining("\n\n"));
 
 			int id = Integer.parseInt(doc.select("#rating").attr("data-novel-id"));
 
