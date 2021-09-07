@@ -4,8 +4,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
-public interface Novel {
+public interface INovel {
 	@NonNull
 	String getName();
 
@@ -26,6 +27,5 @@ public interface Novel {
 	 * @param chapter The chapter to get
 	 * @return The chapter
 	 */
-	@Nullable
-	Chapter getChapter(int chapter) throws IOException;
+	CompletableFuture<Chapter> getChapter(int chapter) throws IOException;
 }

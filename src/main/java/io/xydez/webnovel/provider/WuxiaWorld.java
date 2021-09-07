@@ -4,8 +4,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import io.github.furstenheim.CopyDown;
 import io.xydez.webnovel.Chapter;
-import io.xydez.webnovel.Novel;
-import io.xydez.webnovel.Provider;
+import io.xydez.webnovel.INovel;
+import io.xydez.webnovel.IProvider;
+import io.xydez.webnovel.Utility;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,31 +16,61 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 
-public class WuxiaWorld implements Provider {
+public class WuxiaWorld implements IProvider {
 	@Override
-	public ArrayList<io.xydez.webnovel.Novel> search(String query) throws IOException {
-		ArrayList<io.xydez.webnovel.Novel> novels = new ArrayList<>();
+	public CompletableFuture<List<INovel>> search(String query) {
+		return CompletableFuture.supplyAsync(() -> {
+			// ArrayList<INovel> novels = new ArrayList<>();
 
-		Document doc = Jsoup.connect(String.format("https://wuxiaworld.site/?s=%s&post_type=wp-manga", URLEncoder.encode(query, "UTF-8"))).get();
+			try {
+				Document doc = Jsoup.connect(String.format("https://wuxiaworld.site/?s=%s&post_type=wp-manga", URLEncoder.encode(query, "UTF-8"))).get();
 
-		for (Element result : doc.select(".search-wrap .row")) {
-			Elements cols = result.select("> div");
+				return Utility.sequence(doc.select(".search-wrap .row").stream().map(result -> CompletableFuture.supplyAsync(() -> {
+					System.out.println("Promise begin");
+					Elements cols = result.select("> div");
 
-			// Referer: https://wuxiaworld.site/
-			String imageUrl = cols.get(0).select("img").attr("src");
+					// Referer: https://wuxiaworld.site/
+					String imageUrl = cols.get(0).select("img").attr("src");
 
-			Elements titleEl = cols.get(1).select(".post-title a");
-			String link = titleEl.attr("href");
-			String name = titleEl.text();
+					Elements titleEl = cols.get(1).select(".post-title a");
+					String link = titleEl.attr("href");
+					String name = titleEl.text();
 
-			novels.add(new Novel(name, imageUrl, link));
-		}
+					try {
+						return (INovel)new Novel(name, imageUrl, link);
+					} catch (IOException e) {
+						throw new CompletionException(e);
+					}
+				})).collect(Collectors.toList())).get();
 
-		return novels;
+				/*
+				for (Element result : doc.select(".search-wrap .row")) {
+					Elements cols = result.select("> div");
+
+					// Referer: https://wuxiaworld.site/
+					String imageUrl = cols.get(0).select("img").attr("src");
+
+					Elements titleEl = cols.get(1).select(".post-title a");
+					String link = titleEl.attr("href");
+					String name = titleEl.text();
+
+					novels.add(new Novel(name, imageUrl, link));
+				}
+				*/
+			} catch (Exception e) {
+				throw new CompletionException(e);
+			}
+
+			//return novels;
+		});
 	}
 
-	static class Novel implements io.xydez.webnovel.Novel {
+	static class Novel implements INovel {
 		private final String name;
 		private final String imageUrl;
 		private final String synopsis;
@@ -87,15 +118,22 @@ public class WuxiaWorld implements Provider {
 			return this.chapterLinks.size();
 		}
 
-		@Nullable
 		@Override
-		public Chapter getChapter(int chapter) throws IOException {
-			Document doc = Jsoup.connect(chapterLinks.get(chapter)).get();
-			CopyDown copyDown = new CopyDown();
+		public CompletableFuture<Chapter> getChapter(int chapter) {
+			return CompletableFuture.supplyAsync(() -> {
+				Document doc = null;
+				try {
+					doc = Jsoup.connect(chapterLinks.get(chapter)).get();
+				} catch (IOException e) {
+					throw new CompletionException(e);
+				}
 
-			String content = copyDown.convert(doc.select(".read-container .text-left").html());
+				CopyDown copyDown = new CopyDown();
 
-			return new Chapter(null, content);
+				String content = copyDown.convert(doc.select(".read-container .text-left").html());
+
+				return new Chapter(null, content);
+			});
 		}
 	}
 }

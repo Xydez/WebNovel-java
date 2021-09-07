@@ -3,33 +3,44 @@
  */
 package io.xydez.webnovel;
 
+import io.xydez.webnovel.provider.NovelFull;
 import io.xydez.webnovel.provider.ReadNovelFull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadNovelFullTest {
     @Test
-    public void test() throws IOException {
+    public void test() throws ExecutionException, InterruptedException {
         ReadNovelFull site = new ReadNovelFull();
-        ArrayList<Novel> results = site.search("Super Gene");
+        CompletableFuture<List<INovel>> futureResults = site.search("Super Gene");
+        List<INovel> results = futureResults.get();
+
         assertNotNull(results);
         assertTrue(results.size() > 0);
 
-        for (Novel novel : results) {
-            assertNotNull(novel.getName());
-            novel.getSynopsis();
-            novel.getImageUrl();
+        CompletableFuture.allOf(results.stream().map(novel -> CompletableFuture.runAsync(() -> {
+            try {
+                assertNotNull(novel.getName());
+                novel.getSynopsis();
+                novel.getImageUrl();
 
-            assertTrue(novel.chapters() > 0);
+                assertTrue(novel.chapters() > 0);
 
-            Chapter chapter = novel.getChapter(0);
-            assertNotNull(chapter);
-            chapter.getName();
-            assertNotNull(chapter.getContent());
-        }
+                CompletableFuture<Chapter> futureChapter = novel.getChapter(0);
+                Chapter chapter = futureChapter.get();
+
+                assertNotNull(chapter);
+                assertDoesNotThrow(chapter::getName);
+                assertNotNull(chapter.getContent());
+            } catch (Exception e) {
+                throw new CompletionException(e);
+            }
+        })).toArray(CompletableFuture<?>[]::new)).get();
     }
 }
