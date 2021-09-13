@@ -27,7 +27,7 @@ public class BoxNovelTest {
                 novel.getSynopsis();
                 novel.getImageUrl();
 
-                assertTrue(novel.chapters() > 0);
+                assertTrue(novel.getChapters() > 0);
 
                 CompletableFuture<Chapter> futureChapter = novel.getChapter(0);
                 Chapter chapter = futureChapter.get();

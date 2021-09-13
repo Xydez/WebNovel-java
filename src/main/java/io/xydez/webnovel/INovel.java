@@ -4,9 +4,10 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.CompletableFuture;
 
-public interface INovel {
+public interface INovel extends Serializable {
 	@NonNull
 	String getName();
 
@@ -20,7 +21,7 @@ public interface INovel {
 	 * Get the length of the novel in chapters
 	 * @return length of the novel in chapters
 	 */
-	int chapters();
+	int getChapters();
 
 	/**
 	 * Get a specific chapter from the novel

@@ -104,7 +104,7 @@ public class BoxNovel implements IProvider {
         }
 
         @Override
-        public int chapters() {
+        public int getChapters() {
             return this.chapterUrls.size();
         }
 

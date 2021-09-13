@@ -94,7 +94,7 @@ public class WuxiaWorld implements IProvider {
 		}
 
 		@Override
-		public int chapters() {
+		public int getChapters() {
 			return this.chapterLinks.size();
 		}
 
