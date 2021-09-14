@@ -24,6 +24,11 @@ import org.jsoup.nodes.Element;
 
 public class BoxNovel implements IProvider {
     @Override
+    public String getName() {
+        return "BoxNovel.com";
+    }
+
+    @Override
 	public CompletableFuture<List<INovel>> search(String query) {
 		return CompletableFuture.supplyAsync(() -> {
             ArrayList<INovel> novels = new ArrayList<>();

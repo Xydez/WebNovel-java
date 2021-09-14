@@ -1,6 +1,6 @@
 package io.xydez.webnovel;
 
-import io.xydez.webnovel.provider.WuxiaWorld;
+import io.xydez.webnovel.provider.WuxiaWorldSite;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WuxiaWorldTest {
+public class WuxiaWorldSiteTest {
 	@Test
 	public void test() throws ExecutionException, InterruptedException {
-		WuxiaWorld site = new WuxiaWorld();
+		WuxiaWorldSite site = new WuxiaWorldSite();
 		CompletableFuture<List<INovel>> futureResults = site.search("Super Gene");
 		List<INovel> results = futureResults.get();
 

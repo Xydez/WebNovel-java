@@ -21,7 +21,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
-public class WuxiaWorld implements IProvider {
+public class WuxiaWorldSite implements IProvider {
+	@Override
+	public String getName() {
+		return "WuxiaWorld.site";
+	}
+
 	@Override
 	public CompletableFuture<List<INovel>> search(String query) {
 		return CompletableFuture.supplyAsync(() -> {

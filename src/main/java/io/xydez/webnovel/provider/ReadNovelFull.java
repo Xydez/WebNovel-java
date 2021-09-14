@@ -21,6 +21,11 @@ import java.util.stream.Collectors;
 
 public class ReadNovelFull implements IProvider {
 	@Override
+	public String getName() {
+		return "ReadNovelFull.com";
+	}
+
+	@Override
 	public CompletableFuture<List<INovel>> search(String query) {
 		return CompletableFuture.supplyAsync(() -> {
 			ArrayList<INovel> novels = new ArrayList<>();
