@@ -29,7 +29,7 @@ public class NovelGate implements IProvider {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ArrayList<INovel> novels = new ArrayList<>();
-                Document doc = Jsoup.connect(String.format("https://novelgate.net/search/%s", URLEncoder.encode(query, StandardCharsets.UTF_8))).get();
+                Document doc = Jsoup.connect(String.format("https://novelgate.net/search/%s", URLEncoder.encode(query, "utf-8"))).get();
 
                 for (Element element : doc.select(".list-film .film-item a")) {
                     String url = element.attr("href");
@@ -82,7 +82,7 @@ public class NovelGate implements IProvider {
         }
 
         @Override
-        public int chapters() {
+        public int getChapters() {
             return this.chapterUrls.size();
         }
 

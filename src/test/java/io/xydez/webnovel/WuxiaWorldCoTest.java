@@ -1,14 +1,14 @@
 package io.xydez.webnovel;
 
-import io.xydez.webnovel.provider.WuxiaWorldSite;
+import io.xydez.webnovel.provider.WuxiaWorldCo;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutionException;
 
-public class WuxiaWorldSiteTest {
+public class WuxiaWorldCoTest {
 	@Test
 	public void test() throws ExecutionException, InterruptedException {
-		WuxiaWorldSite site = new WuxiaWorldSite();
+		WuxiaWorldCo site = new WuxiaWorldCo();
 		TestUtility.testProvider(site);
 	}
 }
